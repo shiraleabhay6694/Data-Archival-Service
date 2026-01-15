@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: das-unit-tests
+    environment:
+      # Test configuration - these override production settings
+      JWT_SECRET_KEY: "test-secret-key-for-jwt-signing-12345"
+      JWT_ALGORITHM: "HS256"
+      JWT_EXPIRATION_HOURS: "24"
+      ENCRYPTION_KEY: "test-encryption-key-32-bytes!!=="
+      
+      # Mock database settings (tests use SQLite in-memory)
+      ORCHESTRATOR_DB_HOST: "localhost"
+      ORCHESTRATOR_DB_PORT: "3306"
+      ORCHESTRATOR_DB_NAME: "test_db"
+      ORCHESTRATOR_DB_USER: "test_user"
+      ORCHESTRATOR_DB_PASSWORD: "test_password"
+      
+      # Disable actual Docker spawning in tests
+      DOCKER_SOCKET: "/var/run/docker.sock"
+      WORKER_IMAGE: "das-worker:test"
+      DOCKER_NETWORK: "test-network"
+      
+      # Scheduler settings
+      ARCHIVAL_JOB_CRON: "0 2 * * *"
+      PURGE_JOB_CRON: "0 3 * * *"
+      
+      # Python settings
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      # Mount coverage reports to host for viewing
+      - ./coverage:/app/coverage
+      # Mount tests for live development (optional)
+      # - ./orchestrator/tests:/app/orchestrator/tests:ro
+      # - ./worker/tests:/app/worker/tests:ro
+    networks:
+      - test-network
+
+  # Optional: Run tests with database for integration tests
+  tests-with-db:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: das-integration-tests
+    environment:
+      JWT_SECRET_KEY: "test-secret-key-for-jwt-signing-12345"
+      JWT_ALGORITHM: "HS256"
+      JWT_EXPIRATION_HOURS: "24"
+      ENCRYPTION_KEY: "test-encryption-key-32-bytes!!=="
+      ORCHESTRATOR_DB_HOST: "test-db"
+      ORCHESTRATOR_DB_PORT: "3306"
+      ORCHESTRATOR_DB_NAME: "test_orchestrator"
+      ORCHESTRATOR_DB_USER: "root"
+      ORCHESTRATOR_DB_PASSWORD: "testpassword"
+      DOCKER_SOCKET: "/var/run/docker.sock"
+      WORKER_IMAGE: "das-worker:test"
+      DOCKER_NETWORK: "test-network"
+      ARCHIVAL_JOB_CRON: "0 2 * * *"
+      PURGE_JOB_CRON: "0 3 * * *"
+    depends_on:
+      test-db:
+        condition: service_healthy
+    volumes:
+      - ./coverage:/app/coverage
+    networks:
+      - test-network
+    command: ["pytest", "-v", "-m", "integration", "--tb=short"]
+
+  # Test database for integration tests
+  test-db:
+    image: mysql:8.0
+    container_name: das-test-db
+    environment:
+      MYSQL_ROOT_PASSWORD: testpassword
+      MYSQL_DATABASE: test_orchestrator
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - test-network
+    tmpfs:
+      - /var/lib/mysql  # Use tmpfs for faster tests
+
+networks:
+  test-network:
+    driver: bridge

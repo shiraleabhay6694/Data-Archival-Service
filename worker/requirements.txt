@@ -1,0 +1,7 @@
+# Database
+SQLAlchemy==2.0.25
+PyMySQL==1.1.0
+cryptography==42.0.0
+
+# Utilities
+python-dotenv==1.0.0

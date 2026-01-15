@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  # Orchestrator database - stores configurations and job history
+  orchestrator-db:
+    image: mysql:8.0
+    container_name: das-orchestrator-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ORCHESTRATOR_DB_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${ORCHESTRATOR_DB_NAME:-archival_orchestrator}
+    ports:
+      - "3307:3306"
+    volumes:
+      - orchestrator-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - das-network
+    restart: unless-stopped
+
+  # Primary database (example - for testing)
+  primary-db:
+    image: mysql:8.0
+    container_name: das-primary-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${PRIMARY_DB_PASSWORD:-primarypassword}
+      MYSQL_DATABASE: ${PRIMARY_DB_NAME:-production}
+    ports:
+      - "3308:3306"
+    volumes:
+      - primary-db-data:/var/lib/mysql
+      - ./scripts/init-primary.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - das-network
+    restart: unless-stopped
+
+  # Archival database (example - for testing)
+  archival-db:
+    image: mysql:8.0
+    container_name: das-archival-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ARCHIVAL_DB_PASSWORD:-archivalpassword}
+      MYSQL_DATABASE: ${ARCHIVAL_DB_NAME:-archival_data}
+    ports:
+      - "3309:3306"
+    volumes:
+      - archival-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", " "]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - das-network
+    restart: unless-stopped
+
+  # Orchestrator service
+  orchestrator:
+    build:
+      context: .
+      dockerfile: orchestrator/Dockerfile
+    image: das-orchestrator:latest
+    container_name: das-orchestrator
+    environment:
+      # Application settings
+      APP_NAME: "Data Archival Service - Orchestrator"
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      
+      # Server settings
+      ORCHESTRATOR_HOST: 0.0.0.0
+      ORCHESTRATOR_PORT: 8000
+      
+      # JWT settings
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-this-secret-key-in-production}
+      JWT_ALGORITHM: HS256
+      JWT_EXPIRATION_HOURS: 24
+      
+      # Encryption key for storing credentials
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-your-32-byte-base64-encoded-key-here=}
+      
+      # Orchestrator database connection
+      ORCHESTRATOR_DB_HOST: orchestrator-db
+      ORCHESTRATOR_DB_PORT: 3306
+      ORCHESTRATOR_DB_USER: root
+      ORCHESTRATOR_DB_PASSWORD: ${ORCHESTRATOR_DB_PASSWORD:-rootpassword}
+      ORCHESTRATOR_DB_NAME: ${ORCHESTRATOR_DB_NAME:-archival_orchestrator}
+      
+      # Scheduler settings (cron expressions)
+      ARCHIVAL_JOB_CRON: ${ARCHIVAL_JOB_CRON:-*/5 * * * *}   # Daily at 2 AM
+      PURGE_JOB_CRON: ${PURGE_JOB_CRON:-*/5 * * * *}         # Daily at 3 AM
+      
+      # Docker settings for worker management
+      DOCKER_SOCKET: /var/run/docker.sock
+      WORKER_IMAGE: das-worker:latest
+      DOCKER_NETWORK: das-network
+    ports:
+      - "8000:8000"
+    depends_on:
+      orchestrator-db:
+        condition: service_healthy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # For spawning worker containers
+    networks:
+      - das-network
+    restart: unless-stopped
+
+networks:
+  das-network:
+    driver: bridge
+    name: das-network
+
+volumes:
+  orchestrator-db-data:
+  primary-db-data:
+  archival-db-data:

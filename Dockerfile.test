@@ -1,0 +1,35 @@
+# Dockerfile for running unit tests
+# Build: docker build -f Dockerfile.test -t das-tests .
+# Run: docker run --rm das-tests
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    default-libmysqlclient-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY orchestrator/requirements.txt ./orchestrator/
+COPY worker/requirements.txt ./worker/
+COPY requirements-test.txt ./
+
+# Install dependencies
+RUN pip install --no-cache-dir -r orchestrator/requirements.txt && \
+    pip install --no-cache-dir -r worker/requirements.txt && \
+    pip install --no-cache-dir -r requirements-test.txt
+
+# Copy source code
+COPY orchestrator/ ./orchestrator/
+COPY worker/ ./worker/
+COPY pytest.ini ./
+
+# Set Python path
+ENV PYTHONPATH=/app
+
+# Default command: run all tests with coverage
+CMD ["pytest", "-v", "--tb=short", "--cov=orchestrator", "--cov=worker", "--cov-report=term-missing", "--cov-report=html:/app/coverage"]
