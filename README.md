@@ -176,8 +176,8 @@ Set these in a `.env` file or pass them to docker-compose:
 
 | Variable | What it does | Default |
 |----------|--------------|---------|
-| `JWT_SECRET_KEY` | Secret for signing tokens | change-this |
-| `ENCRYPTION_KEY` | Encrypts stored DB passwords | (required) |
+| `JWT_SECRET_KEY` | Secret for signing tokens | - |
+| `ENCRYPTION_KEY` | Encrypts stored DB passwords | - |
 | `ARCHIVAL_JOB_CRON` | When to run archival | `0 2 * * *` |
 | `PURGE_JOB_CRON` | When to run purge | `0 3 * * *` |
 | `WORKER_IMAGE` | Docker image for workers | `das-worker:latest` |
@@ -205,28 +205,3 @@ archival-service/
 ├── scripts/               # SQL init scripts
 └── docker-compose.yml
 ```
-
-## Troubleshooting
-
-**Workers not starting?**
-
-Check if Docker socket is accessible:
-```bash
-docker ps -a --filter "label=das.service=worker"
-```
-
-**Can't connect to databases?**
-
-Make sure everything is on the same Docker network:
-```bash
-docker network ls
-docker network inspect das-network
-```
-
-**View worker logs:**
-```bash
-docker logs das-worker-1-archival-$(date +%Y%m%d)
-```
-
-
-  

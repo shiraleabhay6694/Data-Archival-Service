@@ -84,7 +84,7 @@ services:
       JWT_EXPIRATION_HOURS: 24
       
       # Encryption key for storing credentials
-      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-your-32-byte-base64-encoded-key-here=}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-WdqLYWrO4fuWB1PxfKBXNatpT3OtWbJBGfmZXOjFZbA=}
       
       # Orchestrator database connection
       ORCHESTRATOR_DB_HOST: orchestrator-db
@@ -94,7 +94,7 @@ services:
       ORCHESTRATOR_DB_NAME: ${ORCHESTRATOR_DB_NAME:-archival_orchestrator}
       
       # Scheduler settings (cron expressions)
-      ARCHIVAL_JOB_CRON: ${ARCHIVAL_JOB_CRON:-*/5 * * * *}   # Daily at 2 AM
+      ARCHIVAL_JOB_CRON: ${ARCHIVAL_JOB_CRON:-*/2 * * * *}   # Daily at 2 AM
       PURGE_JOB_CRON: ${PURGE_JOB_CRON:-*/5 * * * *}         # Daily at 3 AM
       
       # Docker settings for worker management
