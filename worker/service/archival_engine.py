@@ -85,12 +85,12 @@ class ArchivalEngine:
                 try:
                     conn.execute(text(f"""
                         ALTER TABLE `{archive_table}`
-                        ADD COLUMN IF NOT EXISTS `archived_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        ADD COLUMN IF NOT EXISTS `archived_by` VARCHAR(50) DEFAULT 'DAS'
+                        ADD COLUMN `archived_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        ADD COLUMN `archived_by` VARCHAR(50) DEFAULT 'DAS'
                     """))
                     conn.commit()
                 except Exception:
-                    pass
+                    logger.error(f"Failed to populate the additional columns")
             
             return True
         except SQLAlchemyError as e:
