@@ -70,17 +70,6 @@ class ArchiveService:
             "total_records": total,
             "records": records
         }
-    
-    def trigger_job(self, job_type: str) -> None:
-        if job_type not in ["archival", "purge"]:
-            raise ValueError("job_type must be 'archival' or 'purge'")
-        
-        if job_type == "archival":
-            scheduler_service.trigger_archival_now()
-        else:
-            scheduler_service.trigger_purge_now()
-        
-        logger.info(f"Job '{job_type}' triggered manually")
 
 
 # Global archive service instance

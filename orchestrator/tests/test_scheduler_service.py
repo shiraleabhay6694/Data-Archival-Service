@@ -23,17 +23,3 @@ class TestSchedulerService:
         svc.scheduler.running = True
         svc.stop()
         svc.scheduler.shutdown.assert_called_once()
-    
-    def test_trigger_archival(self):
-        from orchestrator.scheduler.scheduler_service import SchedulerService
-        svc = SchedulerService()
-        svc._run_archival_job = MagicMock()
-        svc.trigger_archival_now()
-        svc._run_archival_job.assert_called_once()
-    
-    def test_trigger_purge(self):
-        from orchestrator.scheduler.scheduler_service import SchedulerService
-        svc = SchedulerService()
-        svc._run_purge_job = MagicMock()
-        svc.trigger_purge_now()
-        svc._run_purge_job.assert_called_once()

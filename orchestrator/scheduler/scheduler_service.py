@@ -40,14 +40,6 @@ class SchedulerService:
             self.scheduler.shutdown()
             logger.info("Scheduler stopped")
     
-    def trigger_archival_now(self):
-        logger.info("Manual archival triggered")
-        self._run_archival_job()
-    
-    def trigger_purge_now(self):
-        logger.info("Manual purge triggered")
-        self._run_purge_job()
-    
     def _run_archival_job(self):
         if self._job_running['archival']:
             logger.warning("Archival already running, skipping")
@@ -186,24 +178,6 @@ class SchedulerService:
                 db.commit()
         except Exception as e:
             logger.error(f"Error spawning purge worker for config {cfg.id}: {e}")
-    
-    def get_job_status(self):
-        jobs = self.scheduler.get_jobs()
-        archival_job = next((j for j in jobs if j.id == 'archival_job'), None)
-        purge_job = next((j for j in jobs if j.id == 'purge_job'), None)
-        
-        return {
-            'archival_jobs': {
-                'enabled': archival_job is not None,
-                'running': self._job_running['archival'],
-                'next_run': str(archival_job.next_run_time) if archival_job else None
-            },
-            'purge_jobs': {
-                'enabled': purge_job is not None,
-                'running': self._job_running['purge'],
-                'next_run': str(purge_job.next_run_time) if purge_job else None
-            }
-        }
 
 
 scheduler_service = SchedulerService()

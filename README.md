@@ -144,25 +144,9 @@ curl -X POST http://localhost:8000/api/v1/config/archival \
   }'
 ```
 
-### 3. Trigger manually (or wait for the schedule)
-
-```bash
-# run archival now
-curl -X POST http://localhost:8000/api/v1/archive/trigger/archival \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
-
-# run purge now
-curl -X POST http://localhost:8000/api/v1/archive/trigger/purge \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
-```
-
 ### 4. Check what happened
 
 ```bash
-# view job history
-curl http://localhost:8000/api/v1/archive/jobs/history \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
-
 # view archived data (need table role or admin)
 curl http://localhost:8000/api/v1/archive/orders \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"

@@ -41,15 +41,3 @@ async def get_archived_data(
     except Exception as e:
         logger.error(f"Error fetching archived data: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/trigger/{job_type}")
-async def trigger_job(job_type: str, current_user: dict = Depends(get_current_user)):
-    if not auth_service.is_admin(current_user.get("roles", [])):
-        raise HTTPException(status_code=403, detail="Admin required")
-    
-    try:
-        archive_service.trigger_job(job_type)
-        return {"message": f"{job_type} triggered", "triggered_by": current_user.get("sub")}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))

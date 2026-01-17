@@ -8,7 +8,7 @@ from orchestrator.env.config import settings
 from orchestrator.repository.database import init_db
 from orchestrator.scheduler.scheduler_service import scheduler_service
 from orchestrator.router import auth_router, config_router, archive_router
-from orchestrator.router.schema.common import HealthResponse, JobStatusResponse
+from orchestrator.router.schema.common import HealthResponse
 
 logging.basicConfig(
     level=settings.log_level,
@@ -71,22 +71,6 @@ async def health_check():
         version=settings.app_version,
         timestamp=datetime.utcnow()
     )
-
-
-@app.get("/api/v1/jobs/status", response_model=JobStatusResponse, tags=["Jobs"])
-async def get_jobs_status():
-    try:
-        status_info = scheduler_service.get_job_status()
-        return JobStatusResponse(
-            archival_jobs=status_info['archival_jobs'],
-            purge_jobs=status_info['purge_jobs'],
-            next_archival_run=status_info['archival_jobs'].get('next_run'),
-            next_purge_run=status_info['purge_jobs'].get('next_run')
-        )
-    except Exception as e:
-        logger.error(f"Error getting job status: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
 
 if __name__ == "__main__":
     import uvicorn

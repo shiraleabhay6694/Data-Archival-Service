@@ -6,7 +6,7 @@ from .config import (
     ArchivalConfigResponse
 )
 from .archive import ArchivalDataResponse
-from .common import HealthResponse, JobStatusResponse
+from .common import HealthResponse
 
 __all__ = [
     "CreateTokenRequest",
@@ -17,5 +17,4 @@ __all__ = [
     "ArchivalConfigResponse",
     "ArchivalDataResponse",
     "HealthResponse",
-    "JobStatusResponse",
 ]

@@ -71,3 +71,11 @@ INSERT INTO orders (customer_id, order_number, total_amount, status, created_at)
 (4, 'ORD-2025-005', 159.99, 'pending', DATE_SUB(NOW(), INTERVAL 15 DAY)),
 (5, 'ORD-2025-006', 199.99, 'processing', DATE_SUB(NOW(), INTERVAL 7 DAY)),
 (1, 'ORD-2025-007', 49.99, 'pending', NOW());
+
+
+INSERT INTO orders (customer_id, order_number, total_amount, status, created_at) VALUES
+(1, 'ORD-2024-010', 79.99, 'pending', DATE_SUB(NOW(), INTERVAL 590 DAY)),
+(2, 'ORD-2024-011', 129.99, 'processing', DATE_SUB(NOW(), INTERVAL 560 DAY)),
+(3, 'ORD-2024-014', 89.99, 'completed', DATE_SUB(NOW(), INTERVAL 530 DAY)),
+(4, 'ORD-2024-015', 159.99, 'pending', DATE_SUB(NOW(), INTERVAL 515 DAY)),
+(5, 'ORD-2024-016', 199.99, 'processing', DATE_SUB(NOW(), INTERVAL 557 DAY));
