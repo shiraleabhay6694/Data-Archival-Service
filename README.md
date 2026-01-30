@@ -33,7 +33,7 @@ Move old data out of your primary MySQL database, keep it around in archival sto
 
 **How it works:**
 - You configure which tables to archive and how old data should be before moving it
-- The scheduler runs on a cron schedule (default: 2 AM for archival, 3 AM for purge)
+- The scheduler runs on a cron schedule
 - Each job spawns an isolated Docker container that does the actual work
 - Workers insert data into archival DB, then delete from primary (all in a transaction)
 
@@ -101,7 +101,6 @@ Open the API docs: http://localhost:8000/docs
 docker-compose down
 ```
 
-Add `-v` if you want to wipe the database volumes too:
 
 ```bash
 docker-compose down -v

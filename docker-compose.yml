@@ -94,8 +94,8 @@ services:
       ORCHESTRATOR_DB_NAME: ${ORCHESTRATOR_DB_NAME:-archival_orchestrator}
       
       # Scheduler settings (cron expressions)
-      ARCHIVAL_JOB_CRON: ${ARCHIVAL_JOB_CRON:-*/2 * * * *}   # Daily at 2 AM
-      PURGE_JOB_CRON: ${PURGE_JOB_CRON:-*/5 * * * *}         # Daily at 3 AM
+      ARCHIVAL_JOB_CRON: ${ARCHIVAL_JOB_CRON:-*/2 * * * *}
+      PURGE_JOB_CRON: ${PURGE_JOB_CRON:-*/5 * * * *} 
       
       # Docker settings for worker management
       DOCKER_SOCKET: /var/run/docker.sock

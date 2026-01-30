@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     orchestrator_port: int = Field(default=8000)
     
     # JWT
-    jwt_secret_key: str = Field(default="change-this-secret-key-in-production")
+    jwt_secret_key: str = Field(default="default-key")
     jwt_algorithm: str = Field(default="HS256")
     jwt_expiration_hours: int = Field(default=24)
     
@@ -27,9 +27,9 @@ class Settings(BaseSettings):
     orchestrator_db_password: str = Field(default="password")
     
     # Encryption (Fernet key)
-    encryption_key: str = Field(default="your-32-byte-base64-encoded-key-here=")
+    encryption_key: str = Field(default="key=")
     
-    # Scheduler (cron)
+    # Scheduler (cron) 
     archival_job_cron: str = Field(default="* * * * *")
     purge_job_cron: str = Field(default="* * * * *")
     
